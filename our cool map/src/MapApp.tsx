@@ -97,7 +97,8 @@ export default function MapApp() {
         setOverlay(response);
         console.log(response);
         console.log(overlay)
-      }})}, []);
+      }})
+    }, []);
 
   const [viewState, setViewState] = React.useState({
     latitude: 41.8258,
