@@ -1,11 +1,9 @@
-import './Puzzle.css';
+import './MapApp.css';
 import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import Map, {ViewState, ViewStateChangeEvent, MapLayerMouseEvent, Source, Layer} from "react-map-gl"
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { FeatureCollection } from "geojson";
 import { FillLayer } from "react-map-gl";
-
-import rl_data from "./private/fullDownload.json"
 
 import {myKey} from './private/key'
 
@@ -22,10 +20,20 @@ function isFeatureCollection(json: any): json is FeatureCollection {
   return json.type === "FeatureCollection"
 }
 
-function overlayData(): GeoJSON.FeatureCollection | undefined {
-  if(isFeatureCollection(rl_data))
-    return rl_data
-  return undefined
+async function getGeoData(): Promise<string>{
+  return await fetch("http://localhost:133/getredlinedata?latmin=-90&latmax=90&lonmin=-180&lonmax=180").then(response => 
+  response.json().then(json => json.response.data))
+
+}
+
+async function overlayData(): Promise<GeoJSON.FeatureCollection | undefined>{
+  return getGeoData().then(response => 
+    {console.log(response);
+    if(isFeatureCollection(response)){
+      return response
+    }
+    return undefined
+  });
 }
 
 
@@ -79,18 +87,23 @@ function onMapClick(e: MapLayerMouseEvent){
 
 
 
-export default function Puzzle() {
+export default function MapApp() {
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(undefined);
 
   useEffect(() => {
-    setOverlay(overlayData);
-  }, []);
+    overlayData().then(
+      (response)=>{console.log("setting the overlay");
+      if (response != undefined){
+        setOverlay(response);
+        console.log(response);
+        console.log(overlay)
+      }})}, []);
 
   const [viewState, setViewState] = React.useState({
     latitude: 41.8258,
     longitude: -71.4029,
     zoom: 10
-  });
+  }); 
   return (
     <div className="App"> 
       <Map longitude = {viewState.longitude}
