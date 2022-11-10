@@ -26,15 +26,12 @@ async function getGeoData(): Promise<string>{
 
 }
 
-async function overlayData(): Promise<GeoJSON.FeatureCollection | undefined>{
-  return getGeoData().then(response => 
-    {console.log(response);
+function overlayData(response: any): GeoJSON.FeatureCollection | undefined{
     if(isFeatureCollection(response)){
       return response
     }
     return undefined
-  });
-}
+  }
 
 
 const propertyName = 'holc_grade';
@@ -91,13 +88,22 @@ export default function MapApp() {
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(undefined);
 
   useEffect(() => {
-    overlayData().then(
-      (response)=>{console.log("setting the overlay");
-      if (response != undefined){
-        setOverlay(response);
-        console.log(response);
-        console.log(overlay)
-      }})
+
+    const getoverlay = async () => {
+      const response = await fetch("http://localhost:133/getredlinedata");
+      const json = await response.json();
+      const data = overlayData(json.response.data);
+      //setOverlay(data);
+      setOverlay(data);
+      // overlayData().then(
+      // (response)=>{
+      // console.log("setting the overlay");
+      // if (response != undefined){
+      //   setOverlay(response);
+      //   console.log(response);
+      //   console.log(overlay)
+      }
+    getoverlay().catch(console.error);;
     }, []);
 
   const [viewState, setViewState] = React.useState({
