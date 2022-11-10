@@ -1,11 +1,12 @@
 import './MapApp.css';
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
-import Map, {ViewState, ViewStateChangeEvent, MapLayerMouseEvent, Source, Layer} from "react-map-gl"
+import React, { useState, Dispatch, SetStateAction, useEffect, useRef} from 'react';
+import Map, {MapRef, ViewState, ViewStateChangeEvent, MapLayerMouseEvent, Source, Layer} from "react-map-gl"
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { FeatureCollection } from "geojson";
-import { FillLayer } from "react-map-gl";
+import { FillLayer} from "react-map-gl";
 
 import {myKey} from './private/key'
+import mapboxgl, { PointLike } from 'mapbox-gl';
 
 // When we write tests, we'll be searching using accessible names. So let's
 // use the same constant identifier; that way if we decide to change the text
@@ -78,14 +79,46 @@ function ControlledInput({value, setValue, ariaLabel}: ControlledInputProps) {
 }
 
 
-function onMapClick(e: MapLayerMouseEvent){
-  console.log(e)
+function onMapClick(ev: MapLayerMouseEvent, mapref: React.RefObject<MapRef>){
+  console.log(ev.lngLat.lat)
+  console.log(ev.lngLat.lng)
+  const bbox: [PointLike, PointLike] = [
+    [ev.point.x - 5, ev.point.y - 5],
+    [ev.point.x + 5, ev.point.y + 5]
+];
+  let statestring: string | undefined;
+  let citystring: string | undefined;
+  let namestring: string | undefined;
+  if(mapref.current != null){
+    const selectedFeatures = mapref.current.queryRenderedFeatures(bbox);
+    //Now from here, all we have to do is figure out the state, city and name of the place we've selected
+    console.log(selectedFeatures);
+    //TODO: Go through these and get the city, state, and name of the area clicked(IF DEFINED). Note that the properties may be null.
+    //We care about something in selectedFeatures if and only if its layer has id: "geo-data". So do a filter.
+    for(let i = 0; i < selectedFeatures.length; i++){
+      let feature: mapboxgl.MapboxGeoJSONFeature = selectedFeatures[i];
+      if(feature.properties != null){
+        if(statestring == undefined){
+          statestring = feature.properties.state
+        }
+        if(citystring == undefined){
+          citystring = feature.properties.city
+        }
+        if(namestring == undefined){
+          namestring = feature.properties.name
+        }
+          //So these might be undefined. Only update statestring and the other parts if it's undefined
+      }
+    }
+    console.log("state: " + statestring)
+    console.log("city: " + citystring)
+    console.log("name: " + namestring)
+  }
 }
-
-
 
 export default function MapApp() {
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(undefined);
+  const mapRef = useRef<MapRef>(null)
 
   useEffect(() => {
 
@@ -93,15 +126,7 @@ export default function MapApp() {
       const response = await fetch("http://localhost:133/getredlinedata");
       const json = await response.json();
       const data = overlayData(json.response.data);
-      //setOverlay(data);
       setOverlay(data);
-      // overlayData().then(
-      // (response)=>{
-      // console.log("setting the overlay");
-      // if (response != undefined){
-      //   setOverlay(response);
-      //   console.log(response);
-      //   console.log(overlay)
       }
     getoverlay().catch(console.error);;
     }, []);
@@ -113,11 +138,14 @@ export default function MapApp() {
   }); 
   return (
     <div className="App"> 
-      <Map longitude = {viewState.longitude}
+      <Map
+          ref={mapRef} 
+          longitude = {viewState.longitude}
           mapboxAccessToken = {myKey}
           latitude = {viewState.latitude}
           zoom = {viewState.zoom}
           onMove={(ev: ViewStateChangeEvent)=> setViewState(ev.viewState)}
+          onClick={(ev: MapLayerMouseEvent) => onMapClick(ev,mapRef)}
           style={{width: window.innerWidth, height: window.innerHeight}}
           mapStyle={'mapbox://styles/mapbox/light-v10'}>
         <Source
