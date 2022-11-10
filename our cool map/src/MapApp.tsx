@@ -1,11 +1,12 @@
 import './MapApp.css';
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
-import Map, {ViewState, ViewStateChangeEvent, MapLayerMouseEvent, Source, Layer} from "react-map-gl"
+import React, { useState, Dispatch, SetStateAction, useEffect, useRef} from 'react';
+import Map, {MapRef, ViewState, ViewStateChangeEvent, MapLayerMouseEvent, Source, Layer} from "react-map-gl"
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { FeatureCollection } from "geojson";
-import { FillLayer } from "react-map-gl";
+import { FillLayer} from "react-map-gl";
 
 import {myKey} from './private/key'
+import mapboxgl, { PointLike } from 'mapbox-gl';
 
 // When we write tests, we'll be searching using accessible names. So let's
 // use the same constant identifier; that way if we decide to change the text
@@ -20,11 +21,6 @@ function isFeatureCollection(json: any): json is FeatureCollection {
   return json.type === "FeatureCollection"
 }
 
-async function getGeoData(): Promise<string>{
-  return await fetch("http://localhost:133/getredlinedata?latmin=-90&latmax=90&lonmin=-180&lonmax=180").then(response => 
-  response.json().then(json => json.response.data))
-
-}
 
 function overlayData(response: any): GeoJSON.FeatureCollection | undefined{
     if(isFeatureCollection(response)){
@@ -56,54 +52,78 @@ const geoLayer: FillLayer = {
   }
 }
 
-// Remember that parameter names don't necessarily need to overlap;
-// I could use different variable names in the actual function.
-interface ControlledInputProps {
-  value: string, 
-  // This type comes from React+TypeScript. VSCode can suggest these.
-  //   Concretely, this means "a function that sets a state containing a string"
-  setValue: Dispatch<SetStateAction<string>>,
-  ariaLabel: string 
+
+
+
+function onMapClick(ev: MapLayerMouseEvent, mapref: React.RefObject<MapRef>): String[]{
+  console.log("latitude and longitude: " + ev.lngLat.lat + ", " + ev.lngLat.lng)
+  const bbox: [PointLike, PointLike] = [
+    [ev.point.x - 5, ev.point.y - 5],
+    [ev.point.x + 5, ev.point.y + 5]
+];
+  let statestring: string | undefined;
+  let citystring: string | undefined;
+  let namestring: string | undefined;
+  let returnArray = ['','',''];
+  if(mapref.current != null){
+    const selectedFeatures = mapref.current.queryRenderedFeatures(bbox);
+    for(let i = 0; i < selectedFeatures.length; i++){
+      let feature: mapboxgl.MapboxGeoJSONFeature = selectedFeatures[i];
+      if(feature.properties != null){
+        if(statestring == undefined){
+          statestring = feature.properties.state
+        }
+        if(citystring == undefined){
+          citystring = feature.properties.city
+        }
+        if(namestring == undefined){
+          namestring = feature.properties.name
+        }
+          //So these might be undefined. Only update statestring and the other parts if it's undefined
+      }
+    }
+    if(statestring != undefined){
+      console.log("state: " + statestring)
+      returnArray[0] = statestring
+    }
+    else{
+      console.log("state: could not find state information")
+      returnArray[0] = 'N/A'
+    }
+    if(citystring != undefined){
+      console.log("city: " + citystring)
+      returnArray[1] = citystring
+    }
+    else{
+      console.log("city: could not find city information")
+      returnArray[1] = 'N/A'
+    }
+    if(namestring != undefined){
+      console.log("name: " + namestring)
+      returnArray[2] = namestring
+    }
+    else{
+      console.log("could not find name information")
+      returnArray[2] = 'N/A'
+    }
+  }
+  return returnArray
 }
-
-// Input boxes contain state. We want to make sure React is managing that state,
-//   so we have a special component that wraps the input box.
-function ControlledInput({value, setValue, ariaLabel}: ControlledInputProps) {
-  return (
-    <input value={value} 
-           onChange={(ev) => setValue(ev.target.value)}
-           aria-label={ariaLabel}
-           ></input>
-  );
-}
-
-
-function onMapClick(e: MapLayerMouseEvent){
-  console.log(e)
-}
-
-
 
 export default function MapApp() {
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(undefined);
+  const [clickstring, setClickstring] = useState(' ')
+  const mapRef = useRef<MapRef>(null)
 
   useEffect(() => {
 
-    const getoverlay = async () => {
+    const getOverlay = async () => {
       const response = await fetch("http://localhost:133/getredlinedata");
       const json = await response.json();
       const data = overlayData(json.response.data);
-      //setOverlay(data);
       setOverlay(data);
-      // overlayData().then(
-      // (response)=>{
-      // console.log("setting the overlay");
-      // if (response != undefined){
-      //   setOverlay(response);
-      //   console.log(response);
-      //   console.log(overlay)
       }
-    getoverlay().catch(console.error);;
+    getOverlay().catch(console.error);;
     }, []);
 
   const [viewState, setViewState] = React.useState({
@@ -111,13 +131,23 @@ export default function MapApp() {
     longitude: -71.4029,
     zoom: 10
   }); 
+
   return (
     <div className="App"> 
-      <Map longitude = {viewState.longitude}
+      <pre>
+        {clickstring}
+      </pre>
+      <Map
+          ref={mapRef} 
+          longitude = {viewState.longitude}
           mapboxAccessToken = {myKey}
           latitude = {viewState.latitude}
           zoom = {viewState.zoom}
           onMove={(ev: ViewStateChangeEvent)=> setViewState(ev.viewState)}
+          onClick={(ev: MapLayerMouseEvent) => {let arr = onMapClick(ev,mapRef);
+            setClickstring("Latitude: " + ev.lngLat.lat + ", Longitude: " + ev.lngLat.lng +
+            " \nState: " + arr[0] + " City: " + arr[1] + " Name: " + arr[2])}}
+
           style={{width: window.innerWidth, height: window.innerHeight}}
           mapStyle={'mapbox://styles/mapbox/light-v10'}>
         <Source
