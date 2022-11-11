@@ -6,6 +6,10 @@
 
 ### Add link to repo
 
+## How to Run our Program
+  - First navigate to our ```Server``` and run the ```main``` method to start the backend server. 
+  - Then, navigate to a brower and type ```localhost:133```. This should show a ```404 Not Found``` response in the window, which confirms that you successfully connected to the server, but there is no registered response at that endpoint. To access the redlining GeoJSON dataset, use the ```getredlinedata``` endpoint and provide a bounding box using the ```latmin```, ```latmax```, ```lonmin```, and ```lonmax``` parameters. 
+
 ## **Design Choices**
   - The frontend of our project is organized with an App class that sets up the basic strucute of our web-app and renders our MapApp to display an interactive map. 
 
