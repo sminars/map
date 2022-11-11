@@ -1,8 +1,6 @@
+**Integration - Maps
 
-
-## **Project Details**
-
-**Project Name**: Integration - Maps
+Samantha Minars (sminars) & Dylan Lee (dlee197)
 
 **Estimated Time to Complete Project**: ? hrs
 
