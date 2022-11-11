@@ -27,7 +27,7 @@
 ### Frontend
   - The frontend of our project is organized with an App class that sets up the basic strucute of our web-app and renders our MapApp to display an interactive map. 
   - In MapApp, we overlay the redlining data by making a call to our backend API server inside an effect hook. 
-  - To provide the state, city, and name of a clicked feature, we set-up a useRef hook and map click event to pass into our ```onMapClick``` function. This function first constructs a bounding box from the latitude and longitude values of the area that was clicked. This bounding box is then passed to the ```queryRenderedFeatures()``` method to return back all the features in that area. We create constants to represent the state, city, and name information. We then loop through all the features in the bounding box area to assign the first non-null value to each constant. Finally, we return an array that stores the stae, city, and name information.
+  - To provide the state, city, and name of a clicked feature, we set-up a useRef hook and map click event to pass into our ```onMapClick``` function. This function first constructs a bounding box from the latitude and longitude values of the area that was clicked. This bounding box is then passed to the ```queryRenderedFeatures()``` method to return back all the features in that area. We create constants to represent the state, city, and name information. We then loop through all the features in the bounding box area to assign the first non-null value to each constant. Finally, we return an array that stores the state, city, and name information.
 
 ### Backend
   - The backend of our project was adapted from Sprint 2. We added a ```getredlinedata``` endpoint to our server. 
