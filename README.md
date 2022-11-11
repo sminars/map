@@ -12,7 +12,7 @@
     - Example: ```latmin```
 - Potential Error Responses 
 
- - To open our map web-app in the browser window, navigate to the ```our cool map``` directory and run ```npm start```. The server must be actively running to ensure that the redlining data is visible on the map. Our web-app displays map of the historical redlining data for major cities in the United States.
+ - To open our map web-app in the browser window, navigate to the ```our cool map``` directory in a terminal and run ```npm start```. The server must be actively running to ensure that the redlining data is visible on the map. Our web-app displays map of the historical redlining data for major cities in the United States.
  -  How to interact with the Map:
     - Click and drag using the mouse to navigate to different regions on the map.
     - Scroll to zoom in and out. 
