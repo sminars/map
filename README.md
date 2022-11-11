@@ -19,10 +19,14 @@
     - Click on any any area in the redlining overlay (i.e. the colored regions) to access the state, city, and name of the area if it's defined in the data. 
   
 ## **Design Choices**
+### Frontend:
   - The frontend of our project is organized with an App class that sets up the basic strucute of our web-app and renders our MapApp to display an interactive map. 
+  - 
 
+### Backend
   - The backend of our project
   - ```RedLineHandler``` 
+
 
 ### Errors/Bugs: 
 None
