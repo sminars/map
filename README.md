@@ -4,7 +4,7 @@
 
 ### Estimated Time to Complete Project: 8 hrs
 
-### Add link to repo
+### [github repo](https://github.com/cs0320-f2022/integration-dlee197-sminars.git)
 
 ## How to Run & Intereact with Our Program
  - First navigate to our ```Server``` and run the ```main``` method to start the backend server. 
