@@ -6,10 +6,11 @@
 
 ### [github repo](https://github.com/cs0320-f2022/integration-dlee197-sminars.git)
 
-## How to Run & Intereact with Our Program
+## How to Run & InteReact with Our Program
  - First navigate to our ```Server``` and run the ```main``` method to start the backend server. 
- - Then, navigate to a web brower and type ```localhost:133```. This should show a ```404 Not Found``` response in the window, which confirms that you successfully connected to the server, but there is no registered response at that endpoint. To access the redlining GeoJSON dataset, use the ```getredlinedata``` endpoint and provide a bounding box using the ```latmin```, ```latmax```, ```lonmin```, and ```lonmax``` parameters. 
+ - Then, navigate to a web brower and type ```localhost:133```. This should show a ```404 Not Found``` response in the window, which confirms that you successfully connected to the server, but there is no registered response at that endpoint. To access the redlining GeoJSON dataset, use the ```getredlinedata``` endpoint and provide a bounding box using the ```latmin```, ```latmax```, ```lonmin```, and ```lonmax``` parameters. This will return filtered response displaying a set of features from the GeoJSON data that lie within the bounding box.
     - Example: ```http://localhost:133/getredlinedata?latmin=-97&latmax=-96&lonmin=40.83&lonmax=41```
+- If you call the ```getredlinedata``` endpoint without a bounding box, it will return all of the redlining data in the GeoJSON.
 - A bad request error will occur when an API call is made with...
   - an invalid number of parameters (!=4)
   - a larger numerical value assigned to the minimum latitude than to the maximum latitude
@@ -40,4 +41,4 @@ In our ```TestRedlineHandler``` class, we set up a Spark server and get request 
 
 
 ## Errors/Bugs
-None to our knowledge!
+Our API server returns a 500 Internal Server Error when you pass a non-numerical value to one of the bounding box parameters. We didn't have time to resolve this issue. 
