@@ -7,7 +7,7 @@ latitude and longitude.
 Team members: dlee197 and hadrian
 Contributors: isung2
 Total estimated time: 10~12 hours
-Repository: (https://github.com/cs0320-f2022/sprint-2-dlee197-hadrian)
+
 
 ##Design choices:
 For this project, we decided to create a main package, which houses three sub-packages: server, csv, 
