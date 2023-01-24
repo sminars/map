@@ -4,8 +4,6 @@
 
 ### Estimated Time to Complete Project: 8 hrs
 
-### [github repo](https://github.com/cs0320-f2022/integration-dlee197-sminars.git)
-
 ## How to Run & InteReact with Our Program
  - First navigate to our ```Server``` and run the ```main``` method to start the backend server. 
  - Then, navigate to a web brower and type ```localhost:133```. This should show a ```404 Not Found``` response in the window, which confirms that you successfully connected to the server, but there is no registered response at that endpoint. To access the redlining GeoJSON dataset, use the ```getredlinedata``` endpoint and provide a bounding box using the ```latmin```, ```latmax```, ```lonmin```, and ```lonmax``` parameters. This will return filtered response displaying a set of features from the GeoJSON data that lie within the bounding box.
